@@ -1,0 +1,7 @@
+googletrans==3.1.0a0
+Transformers==4.28.1
+TensorFlow==2.17.0
+tf-keras==2.17.0
+Flask==3.0.3
+Flask-Cors==4.0.1
+pymongo==4.8.0
