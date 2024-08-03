@@ -5,8 +5,6 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-// icon: https://icons.expo.fyi/Index, filter: Ionicons
-
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -17,29 +15,20 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="match_device"
+        name="index"
         options={{
-          title: 'Devices',
+          title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'watch' : 'watch-outline'} color={color} />
+            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="match_status"
+        name="explore"
         options={{
-          title: 'Connection',
+          title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'bluetooth' : 'bluetooth-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="notifications"
-        options={{
-          title: 'Notifications',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'notifications' : 'notifications-outline'} color={color} />
+            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
         }}
       />
