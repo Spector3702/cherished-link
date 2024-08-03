@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, Button, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -82,6 +82,48 @@ export default function Notification() {
     { id: '1', time: '07/10 09:00', message: 'Notification message example 1' },
     { id: '2', time: '07/10 10:30', message: 'Notification message example 2' },
   ]);
+
+  // Refs to hold notification listeners
+  const notificationListener = useRef<Notifications.Subscription | null>(null);
+  const responseListener = useRef<Notifications.Subscription | null>(null);
+
+  useEffect(() => {
+    // Register for notifications
+    registerForPushNotificationsAsync().then(token => {
+      if (token) {
+        setExpoPushToken(token);
+        sendTokenToBackend(token);
+      }
+    });
+
+    // Listener for receiving notifications
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification Received:', notification);
+      setNotifications(currentNotifications => [
+        ...currentNotifications,
+        {
+          id: `${Date.now()}`,
+          time: new Date().toLocaleString(),
+          message: notification.request.content.body ?? 'No message',
+        },
+      ]);
+    });
+
+    // Listener for user interactions with notifications
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Notification Response:', response);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
+    };
+  }, []);
 
   const handleSendToken = async () => {
     const token = await registerForPushNotificationsAsync();
