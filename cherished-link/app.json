@@ -31,6 +31,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "e7bbc95d-74c0-4d4f-a6a2-e5d829cacbec"
+      }
+    },
+    "owner": "spector3702"
   }
 }

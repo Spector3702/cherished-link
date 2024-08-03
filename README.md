@@ -28,3 +28,8 @@
         * device: Pixel 8 API 35
         * run device
     * install Expo: [Document](cherished-link/README.md)
+    * install eas:
+        ```shell
+        npm install -g eas-cli
+        eas init
+        ```

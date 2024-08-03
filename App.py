@@ -1,10 +1,12 @@
-from flask import Flask, request
+import requests
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-import json
 from datetime import datetime
+
 from Translators import Translators
 from DementiaDetection import DementiaDetection
 from Database import MongoDB
+
 
 app = Flask(__name__)
 CORS(app)
@@ -12,14 +14,102 @@ translators = Translators()
 dementiaDetection = DementiaDetection()
 db = MongoDB(host="localhost", account="root", passwrod="1234", port=27017)
 
-@app.route("/detection", methods=["POST"])
-def detection():
+EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
+EXPO_PUSH_TOKEN = "ExponentPushToken[OO-D5lMxJ4jLl-gE5rb783]"
+
+
+def send_notification(title, message):
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    data = {
+        "to": EXPO_PUSH_TOKEN,
+        "sound": "default",
+        "title": title,
+        "body": message,
+        "data": {"time": str(datetime.now())}
+    }
+    response = requests.post(EXPO_PUSH_URL, headers=headers, json=data)
+    if response.status_code == 200:
+        print(f"Notification sent successfully: {response.json()}")
+    else:
+        print(f"Failed to send notification: {response.content}")
+
+
+@app.route("/expo-token", methods=["POST"])
+def expo_token():
+    """
+    Endpoint to receive and store Expo Push Token.
+    """
+    try:
+        data = request.get_json()
+        expo_push_token = data.get("expoPushToken")
+        user = data.get("user")
+
+        if not expo_push_token:
+            return jsonify({"error": "Expo Push Token is required"}), 400
+
+        return jsonify({"message": f"Token received: {expo_push_token}"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/gps", methods=["POST"])
+def gps():
     requestData = request.get_json()
-    translationContent = translators.chineseToEnglish(requestData["content"])
+
+    user = requestData.get("user")
+    location = requestData.get("location")  # Expecting a dictionary with lat and long
+    
+    notification_data = {
+        "user": user,
+        "type": "GPS Alert",
+        "message": "You are too far from home!",
+        "createTime": str(datetime.now())
+    }
+    send_notification("GPS Alert", "You are too far from home!")
+
+    return jsonify({"status": "success", "data": notification_data})
+
+
+@app.route("/blood-pressure", methods=["POST"])
+def blood_pressure():
+    requestData = request.get_json()
+
+    user = requestData.get("user")
+    systolic = requestData.get("systolic")
+    diastolic = requestData.get("diastolic")
+
+    notification_data = {"user": user, "type": "Blood Pressure", "systolic": systolic, "diastolic": diastolic, "createTime": str(datetime.now())}
+    send_notification(notification_data)
+
+    return jsonify({"status": "success", "data": notification_data})
+
+
+@app.route("/voice-detection", methods=["POST"])
+def voice_detection():
+    requestData = request.get_json()
+
+    user = requestData.get("user")
+    content = requestData.get("content")
+
+    translationContent = translators.chineseToEnglish(content)
     detection = dementiaDetection.detection(translationContent)
-    result = {"user": requestData["user"], "content": requestData["content"], "translationContent": translationContent, "detection": detection, "createTime": str(datetime.now())}
+    result = {
+        "user": user,
+        "content": content,
+        "translationContent": translationContent,
+        "detection": detection,
+        "createTime": str(datetime.now())
+    }
     db.save(result)
-    return json.dumps({"user": requestData["user"], "detection": detection})
+ 
+    notification_data = {"user": user, "type": "Voice Detection", "detection": detection, "createTime": str(datetime.now())}
+    send_notification(notification_data)
+
+    return jsonify({"user": user, "detection": detection})
 
 
 if __name__ == '__main__':
