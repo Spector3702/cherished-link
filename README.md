@@ -33,3 +33,4 @@
         npm install -g eas-cli
         eas init
         ```
+    * login: `npx expo login`

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "cherished-link",
-    "slug": "cherished-link",
+    "name": "phone",
+    "slug": "phone",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -37,7 +37,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "e7bbc95d-74c0-4d4f-a6a2-e5d829cacbec"
+        "projectId": "2f5f692b-9e7a-4256-8d45-974555775dfa"
       }
     },
     "owner": "spector3702"
