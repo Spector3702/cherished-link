@@ -30,7 +30,7 @@
     * install Expo: 
         ```
         npx create-expo-app@latest
-        npx expo install expo-notifications
+        npx expo install expo-notifications expo-location
         ```
     * install eas:
         ```shell

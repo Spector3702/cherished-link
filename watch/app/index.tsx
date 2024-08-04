@@ -1,48 +1,84 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import * as Location from 'expo-location';
 
 const WatchScreen: React.FC = () => {
-  // Define state with a union type to include both number and null
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [watchNumber, setWatchNumber] = useState<number | null>(null);
   const [matchingNumber, setMatchingNumber] = useState<number | null>(null);
 
   useEffect(() => {
-    // Simulate retrieving a unique watch number
+    // Simulate generating a unique watch number
     const generateWatchNumber = () => {
-      // This could be a static number or a generated ID
+      // Generate a random number to simulate a unique device number
       const uniqueWatchNumber = Math.floor(Math.random() * 10000);
       setWatchNumber(uniqueWatchNumber);
     };
 
     generateWatchNumber();
 
-    // Simulate fetching data from a server after a delay
-    const fetchMatchingNumber = async () => {
+    (async () => {
       try {
-        const response = await fetch('https://your-backend-server.com/api/getMatchingNumber');
-        const data = await response.json();
-        setMatchingNumber(data.matchingNumber);
+        // Request location permissions
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          console.error('Location permission not granted');
+          return;
+        }
+
+        // Get current location
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        setLocation(currentLocation);
+
+        // Simulate fetching matching number from backend or phone app
+        // Here you would implement the actual request to your server or phone app
+        const fetchedMatchingNumber = await fetchMatchingNumberFromBackend();
+        setMatchingNumber(fetchedMatchingNumber);
       } catch (error) {
-        console.error('Error fetching matching number:', error);
+        // Handle errors and log details to the console
+        // setErrorMsg('Location request failed due to unsatisfied device settings.');
+        console.error('Error fetching location:', error);
       }
-    };
-
-    // Fetch matching number after a delay to show the watch number first
-    const fetchDelay = setTimeout(fetchMatchingNumber, 2000); // 2-second delay
-
-    // Clean up timeout
-    return () => clearTimeout(fetchDelay);
+    })();
   }, []);
+
+  // Simulated function to fetch the matching number from backend or phone app
+  const fetchMatchingNumberFromBackend = async (): Promise<number> => {
+    try {
+      // Simulate fetching a number from a backend service
+      // Replace this with actual fetch call to your backend or communication with phone app
+      const response = await fetch('https://your-backend-server.com/api/getMatchingNumber');
+      const data = await response.json();
+      return data.matchingNumber || Math.floor(Math.random() * 10000); // Simulate a fallback matching number
+    } catch (error) {
+      console.error('Error fetching matching number:', error);
+      return 0; // Fallback to a default value
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
-        {watchNumber !== null ? `Watch Number: ${watchNumber}` : 'Generating Watch Number...'}
-      </Text>
-      {matchingNumber !== null && (
-        <Text style={styles.text}>
-          Matching Number: {matchingNumber}
-        </Text>
+      {errorMsg ? (
+        <Text style={styles.text}>{errorMsg}</Text>
+      ) : (
+        <>
+          {watchNumber !== null && (
+            <Text style={styles.text}>Watch Number: {watchNumber}</Text>
+          )}
+          {location ? (
+            <Text style={styles.text}>
+              Latitude: {location.coords.latitude.toFixed(2)}{'\n'}
+              Longitude: {location.coords.longitude.toFixed(2)}
+            </Text>
+          ) : (
+            <Text style={styles.text}>Fetching location...</Text>
+          )}
+          {matchingNumber !== null && (
+            <Text style={styles.text}>Matching Number: {matchingNumber}</Text>
+          )}
+        </>
       )}
     </View>
   );
@@ -56,8 +92,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   text: {
-    fontSize: 24,
+    fontSize: 16,
     color: '#333',
+    textAlign: 'center',
+    marginVertical: 10,
   },
 });
 
