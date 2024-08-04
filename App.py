@@ -15,7 +15,7 @@ dementiaDetection = DementiaDetection()
 db = MongoDB(host="localhost", account="root", passwrod="1234", port=27017)
 
 EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
-EXPO_PUSH_TOKEN = "ExponentPushToken[OO-D5lMxJ4jLl-gE5rb783]"
+EXPO_PUSH_TOKEN = "ExponentPushToken[SbmLfeLESQwxtfTw6Hx0Vz]"
 
 
 def send_notification(title, message):
