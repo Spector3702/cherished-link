@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import * as Location from 'expo-location';
 
 const WatchScreen: React.FC = () => {
@@ -20,6 +20,16 @@ const WatchScreen: React.FC = () => {
 
     (async () => {
       try {
+        // Check if the platform is Android and not Wear OS
+        if (Platform.OS === 'android' && !Platform.isTV) {
+          try {
+            // Attempt to enable high accuracy mode using Google Play services
+            await Location.enableNetworkProviderAsync();
+          } catch (error) {
+            console.warn('Google Play services might not be available:', error);
+          }
+        }
+
         // Request location permissions
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
@@ -28,18 +38,20 @@ const WatchScreen: React.FC = () => {
           return;
         }
 
-        // Get current location
-        const currentLocation = await Location.getCurrentPositionAsync({});
+        // Retrieve the current location
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
         setLocation(currentLocation);
 
-        // Simulate fetching matching number from backend or phone app
-        // Here you would implement the actual request to your server or phone app
+        console.log('Location retrieved successfully:', currentLocation);
+
+        // Fetch the matching number from backend or other source
         const fetchedMatchingNumber = await fetchMatchingNumberFromBackend();
         setMatchingNumber(fetchedMatchingNumber);
       } catch (error) {
-        // Handle errors and log details to the console
-        // setErrorMsg('Location request failed due to unsatisfied device settings.');
-        console.error('Error fetching location:', error);
+        console.error('Error fetching location or data:', error);
+        setErrorMsg('An error occurred while fetching location or data');
       }
     })();
   }, []);
