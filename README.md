@@ -38,3 +38,13 @@
         eas init
         ```
     * login: `npx expo login`
+* Run phone
+    * `cd phone`
+    * `npx expo start`
+    * press `shift+a`
+    * select emulator
+* Run watch
+    * `cd watch`
+    * `npx expo start`
+    * press `shift+a`
+    * select watch
