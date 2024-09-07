@@ -39,6 +39,30 @@ const WatchScreen: React.FC = () => {
     })();
   }, []);
 
+  const handleUserLocationChange = (userLocationChangeEvent: any) => {
+    const coordinates = userLocationChangeEvent?.nativeEvent?.coordinate;
+
+    if (coordinates) {
+      const locationData = {
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+        latitudeDelta: 0.04,
+        longitudeDelta: 0.05,
+      };
+
+      console.log('User location updated:', locationData);
+      setUserLocation(locationData);
+
+      if (!userCoordinatesRef.current) {
+        mapRef.current?.animateToRegion(locationData, 1000);
+      }
+
+      userCoordinatesRef.current = locationData;
+    } else {
+      console.warn('User location coordinates are undefined.');
+    }
+  };
+
   // Simulated function to fetch the matching number from backend or phone app
   const fetchMatchingNumberFromBackend = async (): Promise<number> => {
     try {
@@ -58,38 +82,10 @@ const WatchScreen: React.FC = () => {
       <MapView
         ref={mapRef}
         style={styles.map}
-        onUserLocationChange={(userLocationChangeEvent) => {
-          const coordinates = userLocationChangeEvent?.nativeEvent?.coordinate;
-
-          if (coordinates) {
-            const locationData = {
-              latitude: coordinates.latitude,
-              longitude: coordinates.longitude,
-              latitudeDelta: 0.04, // Adjust this value based on zoom level needs
-              longitudeDelta: 0.05, // Adjust this value based on zoom level needs
-            };
-
-            console.log('User location updated:', locationData);
-
-            // Store the coordinates when available for further use
-            setUserLocation(locationData);
-
-            // Animate to user's location when first detected
-            if (!userCoordinatesRef.current) {
-              mapRef.current?.animateToRegion(locationData, 1000);
-            }
-
-            // Save the coordinates to prevent multiple animations
-            userCoordinatesRef.current = locationData;
-          } else {
-            console.warn('User location coordinates are undefined.');
-          }
-        }}
+        onUserLocationChange={handleUserLocationChange} // Use the new function here
         showsUserLocation={true}
         followsUserLocation={true}
-      // Additional props can be added based on your requirements
       >
-        {/* You can add your markers here */}
         {userLocation && (
           <Marker
             coordinate={userLocation}
