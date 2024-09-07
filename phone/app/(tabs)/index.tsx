@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, Button, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import * as Location from 'expo-location';
 import Constants from 'expo-constants';
 
 // Function to send the token to the backend
@@ -82,6 +83,9 @@ export default function Notification() {
     { id: '2', time: '07/10 10:30', message: 'Notification message example 2' },
   ]);
 
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   // Refs to hold notification listeners
   const notificationListener = useRef<Notifications.Subscription | null>(null);
   const responseListener = useRef<Notifications.Subscription | null>(null);
@@ -94,6 +98,32 @@ export default function Notification() {
         sendTokenToBackend(token);
       }
     });
+
+    (async () => {
+      try {
+        // Attempt to enable high accuracy mode using Google Play services
+        await Location.enableNetworkProviderAsync();
+
+        // Request location permissions
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          console.error('Location permission not granted');
+          return;
+        }
+
+        // Retrieve the current location
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
+        setLocation(currentLocation);
+
+        console.log('Location retrieved successfully:', currentLocation);
+      } catch (error) {
+        console.error('Error fetching location:', error);
+        setErrorMsg('An error occurred while fetching location');
+      }
+    })();
 
     // Listener for receiving notifications
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
