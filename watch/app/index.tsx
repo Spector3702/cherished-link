@@ -39,6 +39,35 @@ const WatchScreen: React.FC = () => {
     })();
   }, []);
 
+  const sendUserLocationChange = async (locationData: LocationType) => {
+    if (!locationData) return;
+
+    try {
+      const response = await fetch('http://192.168.4.114:5000/gps', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: watchNumber,
+          location: {
+            latitude: locationData.latitude,
+            longitude: locationData.longitude,
+          },
+        }),
+      });
+
+      const data = await response.json();
+      if (data.status !== 'success') {
+        console.error('Failed to send location:', data);
+      } else {
+        console.log('Location sent successfully:', data);
+      }
+    } catch (error) {
+      console.error('Error sending location to backend:', error);
+    }
+  };
+
   const handleUserLocationChange = (userLocationChangeEvent: any) => {
     const coordinates = userLocationChangeEvent?.nativeEvent?.coordinate;
 
@@ -58,6 +87,8 @@ const WatchScreen: React.FC = () => {
       }
 
       userCoordinatesRef.current = locationData;
+
+      sendUserLocationChange(locationData);
     } else {
       console.warn('User location coordinates are undefined.');
     }

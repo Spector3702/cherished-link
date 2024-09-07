@@ -61,11 +61,12 @@ def gps():
     requestData = request.get_json()
 
     user = requestData.get("user")
-    location = requestData.get("location")  # Expecting a dictionary with lat and long
+    location = requestData.get("location")
     
     notification_data = {
         "user": user,
         "type": "GPS Alert",
+        "location": location,
         "message": "You are too far from home!",
         "createTime": str(datetime.now())
     }
