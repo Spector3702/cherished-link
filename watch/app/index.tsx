@@ -2,13 +2,20 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
+type LocationType = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+} | null;
+
 const WatchScreen: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [watchNumber, setWatchNumber] = useState<number | null>(null);
   const [matchingNumber, setMatchingNumber] = useState<number | null>(null);
-  const mapRef = useRef(null); // Reference to the MapView
-  const userCoordinatesRef = useRef(); // Reference to store user coordinates
-  const [userLocation, setUserLocation] = useState(null);
+  const mapRef = useRef<MapView | null>(null);
+  const userCoordinatesRef = useRef<LocationType>(null);
+  const [userLocation, setUserLocation] = useState<LocationType>(null);
 
   useEffect(() => {
     // Simulate generating a unique watch number
@@ -52,25 +59,31 @@ const WatchScreen: React.FC = () => {
         ref={mapRef}
         style={styles.map}
         onUserLocationChange={(userLocationChangeEvent) => {
-          const coordinates = {
-            latitude: userLocationChangeEvent.nativeEvent.coordinate.latitude,
-            longitude: userLocationChangeEvent.nativeEvent.coordinate.longitude,
-            latitudeDelta: 0.04, // Adjust this value based on zoom level needs
-            longitudeDelta: 0.05, // Adjust this value based on zoom level needs
-          };
+          const coordinates = userLocationChangeEvent?.nativeEvent?.coordinate;
 
-          console.log('User location updated:', coordinates);
+          if (coordinates) {
+            const locationData = {
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude,
+              latitudeDelta: 0.04, // Adjust this value based on zoom level needs
+              longitudeDelta: 0.05, // Adjust this value based on zoom level needs
+            };
 
-          // Store the coordinates when available for further use
-          setUserLocation(coordinates);
+            console.log('User location updated:', locationData);
 
-          // Animate to user's location when first detected
-          if (!userCoordinatesRef.current) {
-            mapRef.current?.animateToRegion(coordinates, 1000); // Optional: duration of animation
+            // Store the coordinates when available for further use
+            setUserLocation(locationData);
+
+            // Animate to user's location when first detected
+            if (!userCoordinatesRef.current) {
+              mapRef.current?.animateToRegion(locationData, 1000);
+            }
+
+            // Save the coordinates to prevent multiple animations
+            userCoordinatesRef.current = locationData;
+          } else {
+            console.warn('User location coordinates are undefined.');
           }
-
-          // Save the coordinates to prevent multiple animations
-          userCoordinatesRef.current = coordinates;
         }}
         showsUserLocation={true}
         followsUserLocation={true}
