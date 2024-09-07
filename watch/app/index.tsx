@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import {
+  handleUserLocationChange,
+  sendUserLocationChange,
+  LocationType,
+} from './services/locationService';
 
-type LocationType = {
-  latitude: number;
-  longitude: number;
-  latitudeDelta: number;
-  longitudeDelta: number;
-} | null;
 
 const WatchScreen: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -39,61 +38,6 @@ const WatchScreen: React.FC = () => {
     })();
   }, []);
 
-  const sendUserLocationChange = async (locationData: LocationType) => {
-    if (!locationData) return;
-
-    try {
-      const response = await fetch('http://192.168.4.114:5000/gps', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user: watchNumber,
-          location: {
-            latitude: locationData.latitude,
-            longitude: locationData.longitude,
-          },
-        }),
-      });
-
-      const data = await response.json();
-      if (data.status !== 'success') {
-        console.error('Failed to send location:', data);
-      } else {
-        console.log('Location sent successfully:', data);
-      }
-    } catch (error) {
-      console.error('Error sending location to backend:', error);
-    }
-  };
-
-  const handleUserLocationChange = (userLocationChangeEvent: any) => {
-    const coordinates = userLocationChangeEvent?.nativeEvent?.coordinate;
-
-    if (coordinates) {
-      const locationData = {
-        latitude: coordinates.latitude,
-        longitude: coordinates.longitude,
-        latitudeDelta: 0.04,
-        longitudeDelta: 0.05,
-      };
-
-      console.log('User location updated:', locationData);
-      setUserLocation(locationData);
-
-      if (!userCoordinatesRef.current) {
-        mapRef.current?.animateToRegion(locationData, 1000);
-      }
-
-      userCoordinatesRef.current = locationData;
-
-      sendUserLocationChange(locationData);
-    } else {
-      console.warn('User location coordinates are undefined.');
-    }
-  };
-
   // Simulated function to fetch the matching number from backend or phone app
   const fetchMatchingNumberFromBackend = async (): Promise<number> => {
     try {
@@ -113,7 +57,15 @@ const WatchScreen: React.FC = () => {
       <MapView
         ref={mapRef}
         style={styles.map}
-        onUserLocationChange={handleUserLocationChange} // Use the new function here
+        onUserLocationChange={(event) =>
+          handleUserLocationChange(
+            event,
+            setUserLocation,
+            mapRef,
+            userCoordinatesRef,
+            (locationData) => sendUserLocationChange(locationData, watchNumber)
+          )
+        }
         showsUserLocation={true}
         followsUserLocation={true}
       >
