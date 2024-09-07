@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import * as Location from 'expo-location';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 
 const WatchScreen: React.FC = () => {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [watchNumber, setWatchNumber] = useState<number | null>(null);
   const [matchingNumber, setMatchingNumber] = useState<number | null>(null);
+  const mapRef = useRef(null); // Reference to the MapView
+  const userCoordinatesRef = useRef(); // Reference to store user coordinates
+  const [userLocation, setUserLocation] = useState(null);
 
   useEffect(() => {
     // Simulate generating a unique watch number
@@ -20,32 +22,6 @@ const WatchScreen: React.FC = () => {
 
     (async () => {
       try {
-        // Check if the platform is Android and not Wear OS
-        if (Platform.OS === 'android' && !Platform.isTV) {
-          try {
-            // Attempt to enable high accuracy mode using Google Play services
-            await Location.enableNetworkProviderAsync();
-          } catch (error) {
-            console.warn('Google Play services might not be available:', error);
-          }
-        }
-
-        // Request location permissions
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-          console.error('Location permission not granted');
-          return;
-        }
-
-        // Retrieve the current location
-        const currentLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
-        });
-        setLocation(currentLocation);
-
-        console.log('Location retrieved successfully:', currentLocation);
-
         // Fetch the matching number from backend or other source
         const fetchedMatchingNumber = await fetchMatchingNumberFromBackend();
         setMatchingNumber(fetchedMatchingNumber);
@@ -72,6 +48,43 @@ const WatchScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        onUserLocationChange={(userLocationChangeEvent) => {
+          const coordinates = {
+            latitude: userLocationChangeEvent.nativeEvent.coordinate.latitude,
+            longitude: userLocationChangeEvent.nativeEvent.coordinate.longitude,
+            latitudeDelta: 0.04, // Adjust this value based on zoom level needs
+            longitudeDelta: 0.05, // Adjust this value based on zoom level needs
+          };
+
+          console.log('User location updated:', coordinates);
+
+          // Store the coordinates when available for further use
+          setUserLocation(coordinates);
+
+          // Animate to user's location when first detected
+          if (!userCoordinatesRef.current) {
+            mapRef.current?.animateToRegion(coordinates, 1000); // Optional: duration of animation
+          }
+
+          // Save the coordinates to prevent multiple animations
+          userCoordinatesRef.current = coordinates;
+        }}
+        showsUserLocation={true}
+        followsUserLocation={true}
+      // Additional props can be added based on your requirements
+      >
+        {/* You can add your markers here */}
+        {userLocation && (
+          <Marker
+            coordinate={userLocation}
+            title="Your Location"
+            description="This is where you are currently located"
+          />
+        )}
+      </MapView>
       {errorMsg ? (
         <Text style={styles.text}>{errorMsg}</Text>
       ) : (
@@ -79,14 +92,7 @@ const WatchScreen: React.FC = () => {
           {watchNumber !== null && (
             <Text style={styles.text}>Watch Number: {watchNumber}</Text>
           )}
-          {location ? (
-            <Text style={styles.text}>
-              Latitude: {location.coords.latitude.toFixed(2)}{'\n'}
-              Longitude: {location.coords.longitude.toFixed(2)}
-            </Text>
-          ) : (
-            <Text style={styles.text}>Fetching location...</Text>
-          )}
+
           {matchingNumber !== null && (
             <Text style={styles.text}>Matching Number: {matchingNumber}</Text>
           )}
@@ -108,6 +114,9 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginVertical: 10,
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
 
