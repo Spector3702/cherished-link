@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import {
-  handleUserLocationChange,
-  sendUserLocationChange,
-  LocationType,
-} from './services/locationService';
-
+import { Audio } from 'expo-av';
+import { handleUserLocationChange, sendUserLocationChange, LocationType } from './services/locationService';
+import { startRecording, stopRecording, uploadRecording } from './services/audioService';
 
 const WatchScreen: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -15,11 +12,12 @@ const WatchScreen: React.FC = () => {
   const mapRef = useRef<MapView | null>(null);
   const userCoordinatesRef = useRef<LocationType>(null);
   const [userLocation, setUserLocation] = useState<LocationType>(null);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
 
   useEffect(() => {
     // Simulate generating a unique watch number
     const generateWatchNumber = () => {
-      // Generate a random number to simulate a unique device number
       const uniqueWatchNumber = Math.floor(Math.random() * 10000);
       setWatchNumber(uniqueWatchNumber);
     };
@@ -28,7 +26,6 @@ const WatchScreen: React.FC = () => {
 
     (async () => {
       try {
-        // Fetch the matching number from backend or other source
         const fetchedMatchingNumber = await fetchMatchingNumberFromBackend();
         setMatchingNumber(fetchedMatchingNumber);
       } catch (error) {
@@ -38,17 +35,26 @@ const WatchScreen: React.FC = () => {
     })();
   }, []);
 
-  // Simulated function to fetch the matching number from backend or phone app
   const fetchMatchingNumberFromBackend = async (): Promise<number> => {
     try {
-      // Simulate fetching a number from a backend service
-      // Replace this with actual fetch call to your backend or communication with phone app
       const response = await fetch('https://your-backend-server.com/api/getMatchingNumber');
       const data = await response.json();
-      return data.matchingNumber || Math.floor(Math.random() * 10000); // Simulate a fallback matching number
+      return data.matchingNumber || Math.floor(Math.random() * 10000);
     } catch (error) {
       console.error('Error fetching matching number:', error);
-      return 0; // Fallback to a default value
+      return 0;
+    }
+  };
+
+  const handleRecording = async () => {
+    if (recording) {
+      const uri = recording.getURI();
+      await stopRecording(recording, setRecording);
+      if (uri) {
+        uploadRecording(uri, watchNumber.toString());
+      }
+    } else {
+      await startRecording(setRecording, permissionResponse, requestPermission);
     }
   };
 
@@ -84,12 +90,15 @@ const WatchScreen: React.FC = () => {
           {watchNumber !== null && (
             <Text style={styles.text}>Watch Number: {watchNumber}</Text>
           )}
-
           {matchingNumber !== null && (
             <Text style={styles.text}>Matching Number: {matchingNumber}</Text>
           )}
         </>
       )}
+      <Button
+        title={recording ? 'Stop Recording' : 'Start Recording'}
+        onPress={handleRecording}
+      />
     </View>
   );
 };

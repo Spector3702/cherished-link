@@ -1,3 +1,4 @@
+import os
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -13,6 +14,10 @@ CORS(app)
 translators = Translators()
 dementiaDetection = DementiaDetection()
 db = MongoDB(host="localhost", account="root", passwrod="1234", port=27017)
+
+UPLOAD_FOLDER = './uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 EXPO_PUSH_TOKEN = "ExponentPushToken[SbmLfeLESQwxtfTw6Hx0Vz]"
@@ -94,23 +99,30 @@ def voice_detection():
     requestData = request.get_json()
 
     user = requestData.get("user")
-    content = requestData.get("content")
+    file = requestData.get("file")
 
-    translationContent = translators.chineseToEnglish(content)
-    detection = dementiaDetection.detection(translationContent)
-    result = {
-        "user": user,
-        "content": content,
-        "translationContent": translationContent,
-        "detection": detection,
-        "createTime": str(datetime.now())
-    }
-    db.save(result)
+    if not file:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    # Save the uploaded file locally
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(file_path)
+
+    # translationContent = translators.chineseToEnglish(content)
+    # detection = dementiaDetection.detection(translationContent)
+    # result = {
+    #     "user": user,
+    #     "content": content,
+    #     "translationContent": translationContent,
+    #     "detection": detection,
+    #     "createTime": str(datetime.now())
+    # }
+    # db.save(result)
  
-    notification_data = {"user": user, "type": "Voice Detection", "detection": detection, "createTime": str(datetime.now())}
-    send_notification(notification_data)
+    # notification_data = {"user": user, "type": "Voice Detection", "detection": detection, "createTime": str(datetime.now())}
+    # send_notification(notification_data)
 
-    return jsonify({"user": user, "detection": detection})
+    return jsonify({"user": user, "audio_file": file})
 
 
 if __name__ == '__main__':
