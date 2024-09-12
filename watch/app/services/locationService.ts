@@ -15,7 +15,7 @@ export const sendUserLocationChange = async (
     if (!locationData || user === null) return;
 
     try {
-        const response = await fetch('http://192.168.4.114:5000/gps', {
+        const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/gps', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
