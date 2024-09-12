@@ -42,7 +42,9 @@ python App.py
 ### Run phone
 * 開一個新的終端機
 * `cd phone`
-* `export EXPO_PUBLIC_BACKEND_URL={URL}`, URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000`
+* `export EXPO_PUBLIC_BACKEND_URL={URL}` 
+    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000`
+    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000"`
 * `npx expo start`
 * press `shift+a`
 * select emulator
@@ -51,7 +53,9 @@ python App.py
 ### Run watch
 * 再開一個新的終端機
 * `cd watch`
-* `export EXPO_PUBLIC_BACKEND_URL={URL}`, URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000`
+* `export EXPO_PUBLIC_BACKEND_URL={URL}` 
+    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000`
+    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000"`
 * `npx expo start`
 * press `shift+a`
 * select watch
