@@ -96,17 +96,13 @@ def blood_pressure():
 
 @app.route("/voice-detection", methods=["POST"])
 def voice_detection():
-    requestData = request.get_json()
-
-    user = requestData.get("user")
-    file = requestData.get("file")
-
-    if not file:
-        return jsonify({"error": "No file uploaded"}), 400
+    file_data = request.data
+    user = request.headers.get('user')
 
     # Save the uploaded file locally
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(file_path)
+    file_path = os.path.join(UPLOAD_FOLDER, 'uploaded_audio.m4a')
+    with open(file_path, 'wb') as f:
+        f.write(file_data)
 
     # translationContent = translators.chineseToEnglish(content)
     # detection = dementiaDetection.detection(translationContent)
@@ -122,7 +118,7 @@ def voice_detection():
     # notification_data = {"user": user, "type": "Voice Detection", "detection": detection, "createTime": str(datetime.now())}
     # send_notification(notification_data)
 
-    return jsonify({"user": user, "audio_file": file})
+    return jsonify({"user": user, "audio_file": 'uploaded_audio.m4a'})
 
 
 if __name__ == '__main__':

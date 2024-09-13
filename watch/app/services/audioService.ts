@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import { Audio } from 'expo-av';
 import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
 
 export async function startRecording(
     setRecording: (recording: Audio.Recording | null) => void,
@@ -49,28 +50,24 @@ export async function stopRecording(
     }
 }
 
-export const uploadRecording = async (
-    uri: string,
-    user: string
-) => {
+export const uploadRecording = async (uri: string, user: string) => {
     try {
-        // Fetch the file from the URI and create a Blob object
-        const response = await fetch(uri);
-        const blob = await response.blob();
-
-        // Create a new FormData object
-        const formData = new FormData();
-        formData.append('file', blob, 'recording.m4a'); // Append the blob and specify the file name
-        formData.append('user', user);
-
-        // Make the POST request to the server
-        const uploadResponse = await axios.post('http://192.168.1.116:5000/voice-detection', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        const fileData = await FileSystem.readAsStringAsync(uri, {
+            encoding: FileSystem.EncodingType.Base64,
         });
 
-        // Handle the response from the server
+        const uploadResponse = await axios.post(
+            `${process.env.EXPO_PUBLIC_BACKEND_URL}/voice-detection`,
+            fileData,
+            {
+                headers: {
+                    'Content-Type': 'audio/mpeg',
+                    'Content-Length': fileData.length.toString(),
+                    'user': user,
+                },
+            }
+        );
+
         Alert.alert('Success', `Audio uploaded: ${uploadResponse.data.audio_file}`);
     } catch (error) {
         console.error('Error uploading recording:', error);
