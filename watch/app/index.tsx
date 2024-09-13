@@ -51,7 +51,7 @@ const WatchScreen: React.FC = () => {
       const uri = recording.getURI();
       await stopRecording(recording, setRecording);
       if (uri) {
-        uploadRecording(uri, watchNumber.toString());
+        uploadRecording(uri, watchNumber?.toString() || 'unknown');
       }
     } else {
       await startRecording(setRecording, permissionResponse, requestPermission);
