@@ -1,5 +1,6 @@
 import os
 import requests
+import base64
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
@@ -96,7 +97,8 @@ def blood_pressure():
 
 @app.route("/voice-detection", methods=["POST"])
 def voice_detection():
-    file_data = request.data
+    data = request.get_json()
+    file_data = base64.b64decode(data['fileData'])
     user = request.headers.get('user')
 
     # Save the uploaded file locally

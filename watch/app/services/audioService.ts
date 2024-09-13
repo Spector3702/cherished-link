@@ -58,11 +58,10 @@ export const uploadRecording = async (uri: string, user: string) => {
 
         const uploadResponse = await axios.post(
             `${process.env.EXPO_PUBLIC_BACKEND_URL}/voice-detection`,
-            fileData,
+            { fileData },
             {
                 headers: {
-                    'Content-Type': 'audio/mpeg',
-                    'Content-Length': fileData.length.toString(),
+                    'Content-Type': 'application/json',
                     'user': user,
                 },
             }
