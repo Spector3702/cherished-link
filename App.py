@@ -125,7 +125,7 @@ def voice_detection():
     # db.save(result)
  
     # notification_data = {"user": user, "type": "Voice Detection", "detection": detection, "createTime": str(datetime.now())}
-    # send_notification(notification_data)
+    send_notification("Voice Recieved", "Record voice from watch succeed")
 
     return jsonify({"user": user, "audio_file": 'uploaded_audio.m4a'})
 
