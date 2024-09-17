@@ -21,16 +21,21 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
-EXPO_PUSH_TOKEN = "ExponentPushToken[SbmLfeLESQwxtfTw6Hx0Vz]"
+expo_push_token = None
 
 
 def send_notification(title, message):
+    global expo_push_token
+    if not expo_push_token:
+        print("Expo push token is not set.")
+        return
+
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
     data = {
-        "to": EXPO_PUSH_TOKEN,
+        "to": expo_push_token,
         "sound": "default",
         "title": title,
         "body": message,
@@ -48,6 +53,8 @@ def expo_token():
     """
     Endpoint to receive and store Expo Push Token.
     """
+    global expo_push_token
+
     try:
         data = request.get_json()
         expo_push_token = data.get("expoPushToken")
