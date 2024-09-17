@@ -60,12 +60,11 @@ async function registerForPushNotificationsAsync() {
     alert('Project ID not found');
     return;
   }
+  console.log(projectId)
 
   try {
     token = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId,
-      })
+      await Notifications.getDevicePushTokenAsync()
     ).data;
     console.log('Expo Push Token:', token);
   } catch (e) {
