@@ -64,7 +64,9 @@ async function registerForPushNotificationsAsync() {
 
   try {
     token = (
-      await Notifications.getDevicePushTokenAsync()
+      await Notifications.getExpoPushTokenAsync({
+        projectId,
+      })
     ).data;
     console.log('Expo Push Token:', token);
   } catch (e) {
