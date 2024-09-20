@@ -8,7 +8,6 @@ import { startRecording, stopRecording, uploadRecording } from './services/audio
 const WatchScreen: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [watchNumber, setWatchNumber] = useState<number | null>(null);
-  const [matchingNumber, setMatchingNumber] = useState<number | null>(null);
   const mapRef = useRef<MapView | null>(null);
   const userCoordinatesRef = useRef<LocationType>(null);
   const [userLocation, setUserLocation] = useState<LocationType>(null);
@@ -20,29 +19,28 @@ const WatchScreen: React.FC = () => {
     const generateWatchNumber = () => {
       const uniqueWatchNumber = Math.floor(Math.random() * 10000);
       setWatchNumber(uniqueWatchNumber);
+      sendWatchNumberToBackend(uniqueWatchNumber);
     };
 
     generateWatchNumber();
-
-    (async () => {
-      try {
-        const fetchedMatchingNumber = await fetchMatchingNumberFromBackend();
-        setMatchingNumber(fetchedMatchingNumber);
-      } catch (error) {
-        console.error('Error fetching location or data:', error);
-        setErrorMsg('An error occurred while fetching location or data');
-      }
-    })();
   }, []);
 
-  const fetchMatchingNumberFromBackend = async (): Promise<number> => {
+  // Send the generated watch number to the backend
+  const sendWatchNumberToBackend = async (generatedWatchNumber: number) => {
     try {
-      const response = await fetch('https://your-backend-server.com/api/getMatchingNumber');
-      const data = await response.json();
-      return data.matchingNumber || Math.floor(Math.random() * 10000);
+      const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/set_match_number', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ "match_number": generatedWatchNumber }),
+      });
+      if (!response.ok) {
+        throw new Error('Error sending watch number to backend');
+      }
     } catch (error) {
-      console.error('Error fetching matching number:', error);
-      return 0;
+      console.error('Error sending watch number:', error);
+      setErrorMsg('Failed to send watch number to backend');
     }
   };
 
@@ -86,14 +84,9 @@ const WatchScreen: React.FC = () => {
       {errorMsg ? (
         <Text style={styles.text}>{errorMsg}</Text>
       ) : (
-        <>
-          {watchNumber !== null && (
-            <Text style={styles.text}>Watch Number: {watchNumber}</Text>
-          )}
-          {matchingNumber !== null && (
-            <Text style={styles.text}>Matching Number: {matchingNumber}</Text>
-          )}
-        </>
+        watchNumber !== null && (
+          <Text style={styles.text}>Watch Number: {watchNumber}</Text>
+        )
       )}
       <Button
         title={recording ? 'Stop Recording' : 'Start Recording'}

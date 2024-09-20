@@ -23,6 +23,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 expo_push_token = None
 
+match_number = None
 
 def send_notification(title, message):
     global expo_push_token
@@ -67,6 +68,21 @@ def expo_token():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route("/set_match_number", methods=['POST'])
+def set_match_number():
+    requestData = request.get_json()
+    global match_number
+
+    match_number = requestData.get("match_number")
+    return jsonify({"status": "success", "match_number": match_number})
+    
+
+@app.route("/get_match_number", methods=['GET'])
+def get_match_number():
+    global match_number
+    return jsonify({"match_number": match_number})
 
 
 @app.route("/gps", methods=["POST"])

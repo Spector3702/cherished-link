@@ -1,9 +1,43 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text } from 'react-native';
-import { Link } from 'expo-router';
+import { View, TextInput, StyleSheet, Text, Button } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function MatchDevice() {
   const [deviceCode, setDeviceCode] = useState('');
+  const [matchNumber, setMatchNumber] = useState(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const router = useRouter();
+
+  // Function to fetch match number from backend
+  const fetchMatchNumber = async () => {
+    try {
+      const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/get_match_number');
+      const data = await response.json();
+      setMatchNumber(data.match_number);
+      return data.match_number;
+    } catch (error) {
+      console.error('Error fetching match number:', error);
+      setErrorMsg('Failed to fetch match number from backend');
+      return null;
+    }
+  };
+
+  // Function to handle device matching logic
+  const handleMatchDevice = async () => {
+    const fetchedMatchNumber = await fetchMatchNumber();
+
+    if (fetchedMatchNumber && deviceCode === fetchedMatchNumber.toString()) {
+      router.push({
+        pathname: '/match_status',
+        params: { matchSuccess: 'true' }
+      });
+    } else {
+      router.push({
+        pathname: '/match_status',
+        params: { matchSuccess: 'false' }
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -15,14 +49,11 @@ export default function MatchDevice() {
         placeholder="Device Code"
         keyboardType="numeric"
       />
-      <Link
-        href={{
-          pathname: '/match_status',
-          params: { matchSuccess: deviceCode === '1234' ? 'true' : 'false' }
-        }}
-        style={styles.link}>
-        <Text style={styles.buttonText}>Match Device</Text>
-      </Link>
+      {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
+      <Button
+        title="Match Device"
+        onPress={handleMatchDevice}
+      />
     </View>
   );
 }
@@ -45,13 +76,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
-  link: {
-    padding: 10,
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    textAlign: 'center',
+  errorText: {
+    color: 'red',
+    marginVertical: 10,
   },
 });
