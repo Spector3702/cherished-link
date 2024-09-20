@@ -24,6 +24,7 @@ EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 expo_push_token = None
 
 match_number = None
+match_status = None
 
 def send_notification(title, message):
     global expo_push_token
@@ -83,6 +84,21 @@ def set_match_number():
 def get_match_number():
     global match_number
     return jsonify({"match_number": match_number})
+
+
+@app.route("/set_match_status", methods=['POST'])
+def set_match_status():
+    requestData = request.get_json()
+    global match_status
+
+    match_status = requestData.get("match_status")
+    return jsonify({"status": "success", "match_status": match_status})
+    
+
+@app.route("/get_match_status", methods=['GET'])
+def get_match_status():
+    global match_status
+    return jsonify({"match_status": match_status})
 
 
 @app.route("/gps", methods=["POST"])

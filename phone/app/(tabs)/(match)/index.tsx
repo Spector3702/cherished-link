@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text, Button } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Button, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function MatchDevice() {
   const [deviceCode, setDeviceCode] = useState('');
-  const [matchNumber, setMatchNumber] = useState(null);
+  const [matchNumber, setMatchNumber] = useState<number | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
 
-  // Function to fetch match number from backend
   const fetchMatchNumber = async () => {
     try {
       const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/get_match_number');
@@ -22,19 +21,42 @@ export default function MatchDevice() {
     }
   };
 
-  // Function to handle device matching logic
+  const sendMatchStatus = async (status: 'success' | 'failure') => {
+    try {
+      const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/set_match_status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ match_status: status }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error sending match status to backend');
+      }
+
+      const data = await response.json();
+      console.log('Match status sent to backend:', data);
+    } catch (error) {
+      console.error('Error sending match status:', error);
+      setErrorMsg('Failed to send match status to backend');
+    }
+  };
+
   const handleMatchDevice = async () => {
     const fetchedMatchNumber = await fetchMatchNumber();
 
     if (fetchedMatchNumber && deviceCode === fetchedMatchNumber.toString()) {
+      await sendMatchStatus('success');
       router.push({
         pathname: '/match_status',
-        params: { matchSuccess: 'true' }
+        params: { matchSuccess: 'true' },
       });
     } else {
+      await sendMatchStatus('failure');
       router.push({
         pathname: '/match_status',
-        params: { matchSuccess: 'false' }
+        params: { matchSuccess: 'false' },
       });
     }
   };

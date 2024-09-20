@@ -8,6 +8,7 @@ import { startRecording, stopRecording, uploadRecording } from './services/audio
 const WatchScreen: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [watchNumber, setWatchNumber] = useState<number | null>(null);
+  const [isVerified, setIsVerified] = useState<boolean>(false);
   const mapRef = useRef<MapView | null>(null);
   const userCoordinatesRef = useRef<LocationType>(null);
   const [userLocation, setUserLocation] = useState<LocationType>(null);
@@ -15,7 +16,6 @@ const WatchScreen: React.FC = () => {
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
   useEffect(() => {
-    // Simulate generating a unique watch number
     const generateWatchNumber = () => {
       const uniqueWatchNumber = Math.floor(Math.random() * 10000);
       setWatchNumber(uniqueWatchNumber);
@@ -25,7 +25,6 @@ const WatchScreen: React.FC = () => {
     generateWatchNumber();
   }, []);
 
-  // Send the generated watch number to the backend
   const sendWatchNumberToBackend = async (generatedWatchNumber: number) => {
     try {
       const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/set_match_number', {
@@ -44,6 +43,21 @@ const WatchScreen: React.FC = () => {
     }
   };
 
+  const fetchMatchStatus = async () => {
+    try {
+      const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/get_match_status');
+      const data = await response.json();
+      if (data.match_status === 'success') {
+        setIsVerified(true);
+      } else {
+        setErrorMsg('Verification failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error fetching match status:', error);
+      setErrorMsg('Failed to verify match status.');
+    }
+  };
+
   const handleRecording = async () => {
     if (recording) {
       const uri = recording.getURI();
@@ -56,6 +70,20 @@ const WatchScreen: React.FC = () => {
     }
   };
 
+  // Render the initial view with watch number and verify button
+  if (!isVerified) {
+    return (
+      <View style={styles.container}>
+        {errorMsg && <Text style={styles.text}>{errorMsg}</Text>}
+        {watchNumber !== null && (
+          <Text style={styles.text}>Watch Number: {watchNumber}</Text>
+        )}
+        <Button title="Verify" onPress={fetchMatchStatus} />
+      </View>
+    );
+  }
+
+  // Render the map and recording button after verification is successful
   return (
     <View style={styles.container}>
       <MapView
@@ -81,17 +109,11 @@ const WatchScreen: React.FC = () => {
           />
         )}
       </MapView>
-      {errorMsg ? (
-        <Text style={styles.text}>{errorMsg}</Text>
-      ) : (
-        watchNumber !== null && (
-          <Text style={styles.text}>Watch Number: {watchNumber}</Text>
-        )
-      )}
       <Button
         title={recording ? 'Stop Recording' : 'Start Recording'}
         onPress={handleRecording}
       />
+      {errorMsg && <Text style={styles.text}>{errorMsg}</Text>}
     </View>
   );
 };
