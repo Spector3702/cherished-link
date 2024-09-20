@@ -41,9 +41,9 @@
 ### Run watch
 * 再開一個新的終端機
 * `cd watch`
-* `export EXPO_PUBLIC_BACKEND_URL={URL}` 
-    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000`
-    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000"`
+* `export EXPO_PUBLIC_BACKEND_URL={URL}/watch` 
+    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000/watch`
+    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000/watch"`
 * `npx expo start`
 * press `shift+a`
 * select watch
@@ -51,9 +51,9 @@
 ### Run phone
 * 開一個新的終端機
 * `cd phone`
-* `export EXPO_PUBLIC_BACKEND_URL={URL}` 
-    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000`
-    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000"`
+* `export EXPO_PUBLIC_BACKEND_URL={URL}/phone` 
+    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000/phone`
+    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000/phone"`
 * `npx expo start`
 * press `shift+a`
 * select emulator
