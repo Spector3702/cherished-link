@@ -50,7 +50,7 @@ def send_notification(title, message):
         print(f"Failed to send notification: {response.content}")
 
 
-@app.route("/expo-token", methods=["POST"])
+@app.route("/phone/expo-token", methods=["POST"])
 def expo_token():
     """
     Endpoint to receive and store Expo Push Token.
@@ -71,7 +71,7 @@ def expo_token():
         return jsonify({"error": str(e)}), 500
     
 
-@app.route("/set_match_number", methods=['POST'])
+@app.route("/watch/set_match_number", methods=['POST'])
 def set_match_number():
     requestData = request.get_json()
     global match_number
@@ -80,13 +80,13 @@ def set_match_number():
     return jsonify({"status": "success", "match_number": match_number})
     
 
-@app.route("/get_match_number", methods=['GET'])
+@app.route("/phone/get_match_number", methods=['GET'])
 def get_match_number():
     global match_number
     return jsonify({"match_number": match_number})
 
 
-@app.route("/set_match_status", methods=['POST'])
+@app.route("/phone/set_match_status", methods=['POST'])
 def set_match_status():
     requestData = request.get_json()
     global match_status
@@ -95,13 +95,13 @@ def set_match_status():
     return jsonify({"status": "success", "match_status": match_status})
     
 
-@app.route("/get_match_status", methods=['GET'])
+@app.route("/watch/get_match_status", methods=['GET'])
 def get_match_status():
     global match_status
     return jsonify({"match_status": match_status})
 
 
-@app.route("/gps", methods=["POST"])
+@app.route("/watch/gps", methods=["POST"])
 def gps():
     requestData = request.get_json()
 
@@ -120,21 +120,7 @@ def gps():
     return jsonify({"status": "success", "data": notification_data})
 
 
-@app.route("/blood-pressure", methods=["POST"])
-def blood_pressure():
-    requestData = request.get_json()
-
-    user = requestData.get("user")
-    systolic = requestData.get("systolic")
-    diastolic = requestData.get("diastolic")
-
-    notification_data = {"user": user, "type": "Blood Pressure", "systolic": systolic, "diastolic": diastolic, "createTime": str(datetime.now())}
-    send_notification(notification_data)
-
-    return jsonify({"status": "success", "data": notification_data})
-
-
-@app.route("/voice-detection", methods=["POST"])
+@app.route("/watch/voice-detection", methods=["POST"])
 def voice_detection():
     data = request.get_json()
     file_data = base64.b64decode(data['fileData'])
