@@ -6,7 +6,7 @@
 ### Python
 * 套件安裝（建議用虛擬環境）
     ```shell
-    pip install -r requirements.txt
+    pip install -r /backend/requirements.txt
     ```
 
 ### Expo
@@ -29,9 +29,8 @@
 ## Quick Start
 
 ### Python Backend
-```shell
-python App.py
-```
+* `cd backend`
+* `python App.py`
 * 畫面顯示類似這樣:
     ```sh
     * Running on all addresses (0.0.0.0)
