@@ -1,9 +1,8 @@
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 
 class Translators():
     def __init__(self) -> None:
-        self.translator = Translator()
+        self.translator = GoogleTranslator(source='zh', target='en')
 
     def chineseToEnglish(self, text: str) -> str:
-        trans = self.translator.translate(text, dest='en')
-        return trans.text # type: ignore
+        return self.translator.translate(text)
