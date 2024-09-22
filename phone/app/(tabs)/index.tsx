@@ -1,97 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Location from 'expo-location';
-import Constants from 'expo-constants';
-
-// Function to send the token to the backend
-async function sendTokenToBackend(token: string) {
-  try {
-    const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/expo-token', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user: 'user_id_or_name', // Include any additional user information if needed
-        expoPushToken: token,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to send token to backend');
-    }
-
-    console.log('Token sent to backend successfully');
-    alert('Token sent to backend successfully');
-  } catch (error) {
-    console.error('Error sending token to backend:', error);
-    alert(`Error sending token to backend: ${error}`);
-  }
-}
-
-// Function to register for push notifications and get the token
-async function registerForPushNotificationsAsync() {
-  let token;
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-  if (finalStatus !== 'granted') {
-    alert('Permission not granted to get push token for push notification!');
-    return;
-  }
-
-  const projectId =
-    Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-  if (!projectId) {
-    alert('Project ID not found');
-    return;
-  }
-  console.log(projectId)
-
-  try {
-    token = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId,
-      })
-    ).data;
-    console.log('Expo Push Token:', token);
-  } catch (e) {
-    console.error('Error getting push token:', e);
-    alert(`Error getting push token: ${e}`);
-  }
-
-  return token;
-}
+import { getLocationAsync } from './services/locationService';
+import {
+  registerForPushNotificationsAsync,
+  sendTokenToBackend
+} from './services/notificationService';
 
 export default function Notification() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notifications, setNotifications] = useState([
-    { id: '1', time: 'Current', message: 'Hi there, Welcome to cherished-link' }
+    { id: '1', time: 'Current', message: 'Hi there, Welcome to cherished-link' },
   ]);
 
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Refs to hold notification listeners
   const notificationListener = useRef<Notifications.Subscription | null>(null);
   const responseListener = useRef<Notifications.Subscription | null>(null);
 
   useEffect(() => {
-    // Register for notifications
+    // Register for notifications and send token to the backend
     registerForPushNotificationsAsync().then(token => {
       if (token) {
         setExpoPushToken(token);
@@ -99,31 +29,10 @@ export default function Notification() {
       }
     });
 
-    (async () => {
-      try {
-        // Attempt to enable high accuracy mode using Google Play services
-        await Location.enableNetworkProviderAsync();
-
-        // Request location permissions
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-          console.error('Location permission not granted');
-          return;
-        }
-
-        // Retrieve the current location
-        const currentLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
-        });
-        setLocation(currentLocation);
-
-        console.log('Location retrieved successfully:', currentLocation);
-      } catch (error) {
-        console.error('Error fetching location:', error);
-        setErrorMsg('An error occurred while fetching location');
-      }
-    })();
+    // Get location
+    getLocationAsync()
+      .then(setLocation)
+      .catch(setErrorMsg);
 
     // Listener for receiving notifications
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
@@ -154,14 +63,6 @@ export default function Notification() {
     };
   }, []);
 
-  const handleSendToken = async () => {
-    const token = await registerForPushNotificationsAsync();
-    if (token) {
-      setExpoPushToken(token);
-      await sendTokenToBackend(token);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Text>Your Expo push token: {expoPushToken}</Text>
@@ -175,7 +76,13 @@ export default function Notification() {
         )}
         keyExtractor={item => item.id}
       />
-      <Button title="Register and Send Token" onPress={handleSendToken} />
+      <Button title="Register and Send Token" onPress={async () => {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          setExpoPushToken(token);
+          await sendTokenToBackend(token);
+        }
+      }} />
     </View>
   );
 }
