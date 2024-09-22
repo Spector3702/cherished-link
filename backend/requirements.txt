@@ -1,4 +1,5 @@
 deep-translator==1.11.4
+assemblyai==0.33.0
 transformers==4.43.3
 tensorflow==2.17.0
 tf_keras==2.17.0
