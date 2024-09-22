@@ -5,14 +5,11 @@ import requests
 from datetime import datetime
 
 from services.wander_detection.wander_detection import WanderDetection
-from Translators import Translators
-from DementiaDetection import DementiaDetection
-from Database import MongoDB
+from services.dementia_detection.dementia_detection import DementiaDetection
+
 
 user_wander_detection = {}
-translators = Translators()
 dementiaDetection = DementiaDetection()
-db = MongoDB(host="localhost", account="root", passwrod="1234", port=27017)
 
 watch_routes = Blueprint('watch_routes', __name__)
 EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
@@ -101,17 +98,8 @@ def voice_detection():
     with open(file_path, 'wb') as f:
         f.write(file_data)
 
-    # translationContent = translators.chineseToEnglish(content)
-    # detection = dementiaDetection.detection(translationContent)
-    # result = {
-    #     "user": user,
-    #     "content": content,
-    #     "translationContent": translationContent,
-    #     "detection": detection,
-    #     "createTime": str(datetime.now())
-    # }
-    # db.save(result)
+    detection = dementiaDetection.detection('uploaded_audio.m4a')
 
-    send_notification("Voice Received", "Recorded voice from watch succeeded")
+    send_notification("Voice Received", f"Dementia detection result: {detection}")
 
     return jsonify({"user": user, "audio_file": 'uploaded_audio.m4a'})
