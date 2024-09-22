@@ -8,6 +8,8 @@ from transformers import AutoTokenizer, XLMRobertaForSequenceClassification
 
 from services.mongo_db import MongoDB
 
+logging.basicConfig(level=logging.INFO)
+
 
 class DementiaDetection():
     def __init__(self, user) -> None:
