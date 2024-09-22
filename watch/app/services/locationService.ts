@@ -30,11 +30,7 @@ export const sendUserLocationChange = async (
         });
 
         const data = await response.json();
-        if (data.status !== 'success') {
-            console.error('Failed to send location:', data);
-        } else {
-            console.log('Location sent successfully:', data);
-        }
+        console.log('Location sent successfully:', data);
     } catch (error) {
         console.error('Error sending location to backend:', error);
     }
