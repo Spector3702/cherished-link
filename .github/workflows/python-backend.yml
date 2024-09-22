@@ -1,4 +1,4 @@
-name: Python Unit Tests
+name: Python Backend
 on: [push, pull_request]
 
 jobs:
