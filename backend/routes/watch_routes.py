@@ -9,7 +9,6 @@ from services.dementia_detection.dementia_detection import DementiaDetection
 
 
 user_wander_detection = {}
-dementiaDetection = DementiaDetection()
 
 watch_routes = Blueprint('watch_routes', __name__)
 EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
@@ -71,7 +70,7 @@ def gps():
         user_wander_detection[user] = WanderDetection(
             user_id=user, 
             initial_location=location,
-            expected_time=1,
+            expected_time=10,
             expected_distance=50
         )
 
@@ -98,7 +97,8 @@ def voice_detection():
     with open(file_path, 'wb') as f:
         f.write(file_data)
 
-    detection = dementiaDetection.detection('uploaded_audio.m4a')
+    dementiaDetection = DementiaDetection(user)
+    detection = dementiaDetection.detection(file_path)
 
     send_notification("Voice Received", f"Dementia detection result: {detection}")
 
