@@ -4,10 +4,12 @@ import base64
 import requests
 from datetime import datetime
 
+from services.wander_detection.wander_detection import WanderDetection
 from Translators import Translators
 from DementiaDetection import DementiaDetection
 from Database import MongoDB
 
+user_wander_detection = {}
 translators = Translators()
 dementiaDetection = DementiaDetection()
 db = MongoDB(host="localhost", account="root", passwrod="1234", port=27017)
@@ -67,17 +69,16 @@ def gps():
     user = requestData.get("user")
     location = requestData.get("location")
 
-    notification_data = {
-        "user": user,
-        "type": "GPS Alert",
-        "location": location,
-        "message": "You are too far from home!",
-        "createTime": str(datetime.now())
-    }
+    if user not in user_wander_detection:
+        user_wander_detection[user] = WanderDetection(user_id=user, initial_location=location)
 
-    send_notification("GPS Alert", "You are too far from home!")
+    wander_detector = user_wander_detection[user]
+    wandering = wander_detector.detect_wandering(location)
 
-    return jsonify({"status": "success", "data": notification_data})
+    if wandering:
+        send_notification("Wandering Alert", "Parent is wandering in one place over 10 minutes!")
+
+    return jsonify({"wandering": wandering})
 
 
 @watch_routes.route("/watch/voice-detection", methods=["POST"])
