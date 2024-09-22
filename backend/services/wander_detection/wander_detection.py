@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from math import radians, cos, sin, sqrt, atan2
 
+from services.mongo_db import MongoDB
+
 
 class WanderDetection:
     def __init__(self, user_id, initial_location, expected_time, expected_distance):
@@ -9,6 +11,7 @@ class WanderDetection:
         self.initial_time = datetime.now()
         self.expected_time = expected_time
         self.expected_distance = expected_distance
+        self.db = MongoDB(host="localhost", port=27017, db='cherished-link')
 
     def _haversine_distance(self, loc1, loc2):
         # Convert latitude and longitude from degrees to radians
@@ -33,12 +36,25 @@ class WanderDetection:
             return False  # User moved outside the 50-meter radius
 
         return True  # Still within radius and within time frame
+    
+    def _save_db(self, is_wander):
+        result = {
+            "user": self.user_id,
+            "initialLocation": self.initial_location,
+            "initialTime": self.initial_time,
+            "expectedTime": self.expected_time,
+            "expectedDistance": self.expected_distance,
+            "isWander": is_wander,
+            "createTime": str(datetime.now())
+        }
+        self.db.save('WanderDetection', result)
 
     def detect_wandering(self, new_location):
         if self.update_location(new_location):
             # If the user is still within radius, detect wandering
             time_now = datetime.now()
             if time_now - self.initial_time >= timedelta(minutes=self.expected_time):
+                self._save_db(True)
                 return True  # Wander detected
             
         return False  # No wander detected yet
