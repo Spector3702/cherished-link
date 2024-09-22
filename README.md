@@ -9,6 +9,12 @@
     pip install -r /backend/requirements.txt
     ```
 
+### MongoDB
+* [Mac brew install](https://www.mongodb.com/zh-cn/docs/manual/tutorial/install-mongodb-on-os-x/)
+* start: `brew services start mongodb-community@7.0`
+* view: use [Compass](https://www.mongodb.com/products/tools/compass)
+* stop: `brew services stop mongodb-community@7.0`
+
 ### Expo
 * download & install [Android Studio](https://developer.android.com/studio?hl=zh-tw)
     * click "Virtual Device Manager"
