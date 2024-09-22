@@ -3,10 +3,12 @@ from math import radians, cos, sin, sqrt, atan2
 
 
 class WanderDetection:
-    def __init__(self, user_id, initial_location):
+    def __init__(self, user_id, initial_location, expected_time, expected_distance):
         self.user_id = user_id
         self.initial_location = initial_location
         self.initial_time = datetime.now()
+        self.expected_time = expected_time
+        self.expected_distance = expected_distance
 
     def _haversine_distance(self, loc1, loc2):
         # Convert latitude and longitude from degrees to radians
@@ -27,7 +29,7 @@ class WanderDetection:
     def update_location(self, new_location):
         # Check if new location is within 50 meters of the initial location
         distance = self._haversine_distance(self.initial_location, new_location)
-        if distance > 50:
+        if distance > self.expected_distance:
             return False  # User moved outside the 50-meter radius
 
         return True  # Still within radius and within time frame
@@ -36,7 +38,7 @@ class WanderDetection:
         if self.update_location(new_location):
             # If the user is still within radius, detect wandering
             time_now = datetime.now()
-            if time_now - self.initial_time >= timedelta(minutes=1):
+            if time_now - self.initial_time >= timedelta(minutes=self.expected_time):
                 return True  # Wander detected
             
         return False  # No wander detected yet

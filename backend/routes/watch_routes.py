@@ -70,7 +70,12 @@ def gps():
     location = requestData.get("location")
 
     if user not in user_wander_detection:
-        user_wander_detection[user] = WanderDetection(user_id=user, initial_location=location)
+        user_wander_detection[user] = WanderDetection(
+            user_id=user, 
+            initial_location=location,
+            expected_time=1,
+            expected_distance=50
+        )
 
     wander_detector = user_wander_detection[user]
     wandering = wander_detector.detect_wandering(location)
