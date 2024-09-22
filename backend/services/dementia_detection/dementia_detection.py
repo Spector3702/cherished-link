@@ -27,7 +27,7 @@ class DementiaDetection():
         transcript = transcriber.transcribe(file_path)
         text = transcript.text
 
-        logging.info(f"Text regconition: {text}")
+        logging.info(f"Text recognized: {text}")
         return text
 
     def _chineseToEnglish(self, text: str) -> str:
