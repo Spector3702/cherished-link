@@ -65,7 +65,6 @@ export default function Notification() {
 
   return (
     <View style={styles.container}>
-      <Text>Your Expo push token: {expoPushToken}</Text>
       <FlatList
         data={notifications}
         renderItem={({ item }) => (
