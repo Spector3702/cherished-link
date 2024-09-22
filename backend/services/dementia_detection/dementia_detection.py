@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 class DementiaDetection():
     def __init__(self, user) -> None:
         self.user = user
-        self.db = MongoDB(host="localhost", account="root", passwrod="1234", port=27017)
+        self.db = MongoDB(host="localhost", port=27017, db='cherished-link')
         self.translator = GoogleTranslator(source='zh-TW', target='en')
         self.tokenizer = AutoTokenizer.from_pretrained("vjsyong/xlm-roberta-dementia_detection")
         self.model = XLMRobertaForSequenceClassification.from_pretrained("vjsyong/xlm-roberta-dementia_detection", from_tf=True)
@@ -44,7 +44,7 @@ class DementiaDetection():
             "detection": detection,
             "createTime": str(datetime.now())
         }
-        self.db.save(result)
+        self.db.save('DementiaDetection', result)
 
     def detection(self, file_path) -> int:
         chinese = self._speech2text(file_path)
@@ -54,5 +54,8 @@ class DementiaDetection():
         with torch.no_grad():
             logits = self.model(**inputs).logits # type: ignore
             predicted_class_id = logits.argmax().item()
-            return predicted_class_id
+
+        self._save_db(chinese, english, predicted_class_id)
+        
+        return predicted_class_id
 
