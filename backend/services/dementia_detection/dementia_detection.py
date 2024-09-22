@@ -1,10 +1,12 @@
 import torch
 import logging
 import assemblyai as aai
+
 from datetime import datetime
 from deep_translator import GoogleTranslator
 from transformers import AutoTokenizer, XLMRobertaForSequenceClassification
-from Database import MongoDB
+
+from services.mongo_db import MongoDB
 
 
 class DementiaDetection():
