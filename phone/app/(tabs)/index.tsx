@@ -80,8 +80,7 @@ async function registerForPushNotificationsAsync() {
 export default function Notification() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notifications, setNotifications] = useState([
-    { id: '1', time: '07/10 09:00', message: 'Notification message example 1' },
-    { id: '2', time: '07/10 10:30', message: 'Notification message example 2' },
+    { id: '1', time: 'Current', message: 'Hi there, Welcome to cherished-link' }
   ]);
 
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
