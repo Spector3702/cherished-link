@@ -93,7 +93,9 @@ def voice_detection():
     file_data = base64.b64decode(data['fileData'])
     user = request.headers.get('user')
 
-    file_path = os.path.join(UPLOAD_FOLDER, 'uploaded_audio.m4a')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(UPLOAD_FOLDER, f"{user}_{timestamp}.m4a")
+
     with open(file_path, 'wb') as f:
         f.write(file_data)
 
@@ -102,4 +104,4 @@ def voice_detection():
 
     send_notification("Voice Received", f"Dementia detection result: {detection}")
 
-    return jsonify({"user": user, "audio_file": 'uploaded_audio.m4a'})
+    return jsonify({"user": user, "audio_file": file_path})
