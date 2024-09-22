@@ -11,7 +11,7 @@ async function sendLocationToBackend(location: Location.LocationObject) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                home_location: location
+                home_location: location.coords
             }),
         });
 

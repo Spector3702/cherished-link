@@ -68,6 +68,7 @@ def gps():
 
     user = requestData.get("user")
     location = requestData.get("location")
+    home_location = current_app.config['HOME_LOCATION']
 
     if user not in user_wander_detection:
         user_wander_detection[user] = WanderDetection(
@@ -82,6 +83,10 @@ def gps():
 
     if wandering:
         send_notification("Wandering Alert", "Parent is wandering in one place over 10 minutes!")
+    
+    distance_from_home = wander_detector._haversine_distance(home_location, location)
+    if distance_from_home > 50:
+        send_notification("Location Alert", f"Parent has moved {distance_from_home:.2f} meters away from home!")
 
     return jsonify({"wandering": wandering})
 
