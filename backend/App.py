@@ -13,6 +13,7 @@ app.register_blueprint(watch_routes)
 app.config['EXPO_PUSH_TOKEN'] = None
 app.config['MATCH_NUMBER'] = None
 app.config['MATCH_STATUS'] = None
+app.config['HOME_LOCATION'] = None
 
 
 if __name__ == '__main__':

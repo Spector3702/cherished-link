@@ -25,6 +25,7 @@ def get_match_number():
     match_number = current_app.config['MATCH_NUMBER']
     return jsonify({"match_number": match_number})
 
+
 @phone_routes.route("/phone/set_match_status", methods=['POST'])
 def set_match_status():
     requestData = request.get_json()
@@ -32,3 +33,12 @@ def set_match_status():
 
     current_app.config['MATCH_STATUS'] = match_status
     return jsonify({"status": "success", "match_status": match_status})
+
+
+@phone_routes.route("/phone/set_home_location", methods=['POST'])
+def set_home_location():
+    requestData = request.get_json()
+    home_location = requestData.get("home_location")
+
+    current_app.config['HOME_LOCATION'] = home_location
+    return jsonify({"status": "success", "home_location": home_location})
