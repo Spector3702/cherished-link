@@ -20,7 +20,7 @@ class DementiaDetection():
         self.model = XLMRobertaForSequenceClassification.from_pretrained("vjsyong/xlm-roberta-dementia_detection", from_tf=True)
 
     def _speech2text(self, file_path):
-        aai.settings.api_key = "53bdbc097f794bf58e72af39cd84862c"
+        aai.settings.api_key = "4ac7d2d57d97426e92455f47feafcf08"
         config = aai.TranscriptionConfig(language_code="zh")
         transcriber = aai.Transcriber(config=config)
 
