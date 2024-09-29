@@ -8,7 +8,7 @@ import {
   sendTokenToBackend
 } from './services/notificationService';
 
-export default function Notification() {
+export default function PhoneNotificationPage() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notifications, setNotifications] = useState([
     { id: '1', time: 'Current', message: 'Hi there, Welcome to cherished-link' },

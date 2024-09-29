@@ -1,0 +1,26 @@
+name: Phone Expo App
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '22.9'
+
+      - run: npm install
+      - run: npx expo install -- --save-dev @testing-library/react-native
+      - run: npm run test
+
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: '18'
+#       - run: npm install
+#       - run: npm install -g expo-cli
+#       - run: expo login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
+#       - run: expo build:android --no-wait
