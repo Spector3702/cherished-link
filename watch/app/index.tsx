@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, Modal, Image, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Audio } from 'expo-av';
 import { handleUserLocationChange, sendUserLocationChange, LocationType } from './services/locationService';
@@ -14,6 +14,8 @@ const WatchScreen: React.FC = () => {
   const [userLocation, setUserLocation] = useState<LocationType>(null);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [isModalVisible, setModalVisible] = useState<boolean>(false);
+  const [uploadedMessage, setUploadedMessage] = useState<string>('');
 
   useEffect(() => {
     const generateWatchNumber = () => {
@@ -61,14 +63,42 @@ const WatchScreen: React.FC = () => {
   const handleRecording = async () => {
     if (recording) {
       const uri = recording.getURI();
-      await stopRecording(recording, setRecording);
+      await stopRecording(recording, setRecording); // Ensure recording is stopped
       if (uri) {
-        uploadRecording(uri, watchNumber?.toString() || 'unknown');
+        await uploadRecording(uri, watchNumber?.toString() || 'unknown'); // Ensure upload completes before setting modal
+        setUploadedMessage('家人已經收到囉!!');
+        setModalVisible(true); // Show modal after upload completes
       }
     } else {
       await startRecording(setRecording, permissionResponse, requestPermission);
     }
   };
+
+  const closeModal = () => {
+    setModalVisible(false); // Close the modal
+  };
+
+  // Custom Modal
+  interface CustomAlertProps {
+    visible: boolean;
+    onClose: () => void;
+    message: string;
+  }
+
+  const CustomAlert: React.FC<CustomAlertProps> = ({ visible, onClose, message }) => (
+    <Modal transparent={true} visible={visible} animationType="fade">
+      <View style={styles.modalBackground}>
+        <View style={styles.alertContainer}>
+          <Image source={require('../assets/check_icon.png')} style={styles.iconStyle} />
+          <Text style={styles.successText}>家人已經收到囉!!</Text>
+          <Text style={styles.messageText}>{message}</Text>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 
   // Render the initial view with watch number and verify button
   if (!isVerified) {
@@ -114,6 +144,8 @@ const WatchScreen: React.FC = () => {
         onPress={handleRecording}
       />
       {errorMsg && <Text style={styles.text}>{errorMsg}</Text>}
+      {/* Custom Modal */}
+      <CustomAlert visible={isModalVisible} onClose={closeModal} message={uploadedMessage} />
     </View>
   );
 };
@@ -133,6 +165,44 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  alertContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  iconStyle: {
+    width: 50,
+    height: 50,
+    marginBottom: 20,
+  },
+  successText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  messageText: {
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#007BFF',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

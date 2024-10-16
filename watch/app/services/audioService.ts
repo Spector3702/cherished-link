@@ -67,7 +67,7 @@ export const uploadRecording = async (uri: string, user: string) => {
             }
         );
 
-        Alert.alert('Success', `Audio uploaded: ${uploadResponse.data.audio_file}`);
+        console.log('Audio uploaded:', uploadResponse.data.audio_file);
     } catch (error) {
         console.error('Error uploading recording:', error);
         Alert.alert('Error', 'Failed to upload the recording');

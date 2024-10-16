@@ -54,16 +54,27 @@ export const handleUserLocationChange = (
             longitudeDelta: 0.05,
         };
 
-        console.log('User location updated:', locationData);
-        setUserLocation(locationData);
+        // 只在位置明顯變化時才更新
+        if (
+            !userCoordinatesRef.current ||
+            Math.abs(userCoordinatesRef.current.latitude - locationData.latitude) > 0.0001 ||
+            Math.abs(userCoordinatesRef.current.longitude - locationData.longitude) > 0.0001
+        ) {
+            console.log('User location updated:', locationData);
+            setUserLocation(locationData);
 
-        if (!userCoordinatesRef.current) {
-            mapRef.current?.animateToRegion(locationData, 1000);
+            // 只有當還未有座標時才動畫定位
+            if (!userCoordinatesRef.current) {
+                mapRef.current?.animateToRegion(locationData, 1000);
+            }
+
+            userCoordinatesRef.current = locationData;
+
+            // 傳送位置更新給後端
+            sendUserLocationChangeFn(locationData);
+        } else {
+            console.log('Location change is too small, not updating.');
         }
-
-        userCoordinatesRef.current = locationData;
-
-        sendUserLocationChangeFn(locationData);
     } else {
         console.warn('User location coordinates are undefined.');
     }
