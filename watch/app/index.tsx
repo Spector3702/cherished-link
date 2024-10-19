@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Modal, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Audio } from 'expo-av';
 import CustomAlert from './customAlert';
