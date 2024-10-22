@@ -119,7 +119,9 @@ const WatchScreen: React.FC = () => {
         )}
       </MapView>
 
-      <Image source={require('../assets/record_icon.png')} style={styles.iconStyle} />
+      <TouchableOpacity onPress={handleRecording}>
+        <Image source={require('../assets/record_icon.png')} style={styles.iconStyle} />
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={handleRecording}>
         <Text style={styles.buttonText}>
