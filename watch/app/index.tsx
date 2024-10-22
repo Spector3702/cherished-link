@@ -143,7 +143,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
+    // ...StyleSheet.absoluteFillObject,
+    width: 0,
+    height: 0,
   },
 });
 
