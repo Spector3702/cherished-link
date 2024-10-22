@@ -71,7 +71,8 @@ def gps():
             user_id=user, 
             initial_location=location,
             expected_time=60,
-            expected_distance=1610
+            expected_max_distance=1610,
+            expected_min_distance=10
         )
 
     wander_detector = user_wander_detection[user]
