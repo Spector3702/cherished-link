@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, Image } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Audio } from 'expo-av';
 import CustomAlert from './customAlert';
@@ -118,11 +118,18 @@ const WatchScreen: React.FC = () => {
           />
         )}
       </MapView>
+
+      <Image source={require('../assets/check_icon.png')} style={styles.iconStyle} />
+
       <Button
         title={recording ? 'Stop Recording' : 'Start Recording'}
         onPress={handleRecording}
       />
+
+      <Text style={styles.boldText}>跟家人分享一下在幹嘛吧！</Text>
+
       {errorMsg && <Text style={styles.text}>{errorMsg}</Text>}
+
       {/* Custom Modal */}
       <CustomAlert visible={isModalVisible} onClose={closeModal} message={uploadedMessage} />
     </View>
@@ -134,7 +141,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'white',
   },
   text: {
     fontSize: 16,
@@ -146,6 +153,18 @@ const styles = StyleSheet.create({
     // ...StyleSheet.absoluteFillObject,
     width: 0,
     height: 0,
+  },
+  iconStyle: {
+    width: 70,
+    height: 70,
+    marginBottom: 10,
+  },
+  boldText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+    marginHorizontal: 25,
   },
 });
 
