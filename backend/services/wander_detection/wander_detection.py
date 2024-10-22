@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from math import radians, cos, sin, sqrt, atan2
 
@@ -33,12 +34,14 @@ class WanderDetection:
     def _update_location(self, new_location):
         # Check if new location is within expected range of the initial location
         distance = self._haversine_distance(self.initial_location, new_location)
-        if distance > self.expected_max_distance or distance < self.expected_min_distance:
-            return False  # User moved outside the expected range
+        logging.info(f"Distance from initial location: {distance:.2f} meters")
 
-        return True  # Still within radius and within time frame
+        if distance > self.expected_max_distance or distance < self.expected_min_distance:
+            return None  # User moved outside the expected range
+
+        return distance  # Still within radius and within time frame
     
-    def _save_db(self, is_wander):
+    def _save_db(self, is_wander, distance):
         result = {
             "user": self.user_id,
             "initialLocation": self.initial_location,
@@ -46,17 +49,19 @@ class WanderDetection:
             "expectedTime": self.expected_time,
             "expectedMaxDistance": self.expected_max_distance,
             "expectedMinDistance": self.expected_min_distance,
+            "distance": distance,
             "isWander": is_wander,
             "createTime": str(datetime.now())
         }
         self.db.save('WanderDetection', result)
 
     def detect_wandering(self, new_location):
-        if self._update_location(new_location):
+        distance = self._update_location(new_location)
+        if distance is not None:
             # If the user is still within radius, detect wandering
             time_now = datetime.now()
             if time_now - self.initial_time >= timedelta(minutes=self.expected_time):
-                self._save_db(True)
+                self._save_db(True, distance)
                 return True  # Wander detected
             
         return False  # No wander detected yet

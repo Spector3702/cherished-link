@@ -57,8 +57,8 @@ export const handleUserLocationChange = (
         // 只在位置明顯變化時才更新
         if (
             !userCoordinatesRef.current ||
-            Math.abs(userCoordinatesRef.current.latitude - locationData.latitude) > 0.0001 ||
-            Math.abs(userCoordinatesRef.current.longitude - locationData.longitude) > 0.0001
+            Math.abs(userCoordinatesRef.current.latitude - locationData.latitude) > 0.00001 ||
+            Math.abs(userCoordinatesRef.current.longitude - locationData.longitude) > 0.00001
         ) {
             console.log('User location updated:', locationData);
             setUserLocation(locationData);
