@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Image } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity, Image } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Audio } from 'expo-av';
 import CustomAlert from './customAlert';
@@ -119,12 +119,13 @@ const WatchScreen: React.FC = () => {
         )}
       </MapView>
 
-      <Image source={require('../assets/check_icon.png')} style={styles.iconStyle} />
+      <Image source={require('../assets/record_icon.png')} style={styles.iconStyle} />
 
-      <Button
-        title={recording ? 'Stop Recording' : 'Start Recording'}
-        onPress={handleRecording}
-      />
+      <TouchableOpacity style={styles.button} onPress={handleRecording}>
+        <Text style={styles.buttonText}>
+          {recording ? '按一下結束錄音' : '按一下開始錄音'}
+        </Text>
+      </TouchableOpacity>
 
       <Text style={styles.boldText}>跟家人分享一下在幹嘛吧！</Text>
 
@@ -154,10 +155,19 @@ const styles = StyleSheet.create({
     width: 0,
     height: 0,
   },
+  button: {
+    backgroundColor: 'transparent',
+    padding: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 18,
+    color: 'black',
+    textDecorationLine: 'underline',
+  },
   iconStyle: {
     width: 70,
     height: 70,
-    marginBottom: 10,
   },
   boldText: {
     fontSize: 18,
