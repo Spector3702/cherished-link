@@ -32,7 +32,7 @@ const WatchScreen: React.FC = () => {
     if (isVerified) {
       intervalId = setInterval(() => {
         sendVitalSigns();
-      }, 10000); // 每十秒鐘傳送一次
+      }, 3600000); // 每小時傳送一次
     }
 
     return () => {
