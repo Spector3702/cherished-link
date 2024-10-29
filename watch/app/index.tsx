@@ -5,6 +5,7 @@ import { Audio } from 'expo-av';
 import CustomAlert from './customAlert';
 import { handleUserLocationChange, sendUserLocationChange, LocationType } from './services/locationService';
 import { startRecording, stopRecording, uploadRecording } from './services/audioService';
+import { sendVitalSigns } from './services/vitalsignService';
 
 const WatchScreen: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -26,6 +27,7 @@ const WatchScreen: React.FC = () => {
     };
 
     generateWatchNumber();
+    sendVitalSigns();
 
     let intervalId: NodeJS.Timeout | null = null;
 
@@ -72,30 +74,6 @@ const WatchScreen: React.FC = () => {
     } catch (error) {
       console.error('Error fetching match status:', error);
       setErrorMsg('Failed to verify match status.');
-    }
-  };
-
-  const sendVitalSigns = async () => {
-    const VitalSigns = {
-      heartRate: 72,
-      bloodPressure: '120/80',
-      bodyTemperature: 36.5
-    };
-
-    try {
-      const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/vitalsigns', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(VitalSigns),
-      });
-      if (!response.ok) {
-        throw new Error('Error sending vital signs data to backend');
-      }
-    } catch (error) {
-      console.error('Error sending vital signs data:', error);
-      setErrorMsg('Failed to send vital signs data to backend');
     }
   };
 
