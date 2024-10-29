@@ -110,3 +110,13 @@ def voice_detection():
     send_notification("Voice Received", f"Dementia detection result: {detection}")
 
     return jsonify({"user": user, "audio_file": file_path})
+
+
+@watch_routes.route("/watch/vitalsigns", methods=["POST"])
+def vitalsigns():
+    requestData = request.get_json()
+
+    formatted_vitalsigns = "Vitalsigns:\n" + "\n".join([f"  - {key}: {value}" for key, value in requestData.items()])
+    send_notification("Vital Signs Info", f"{formatted_vitalsigns}")
+
+    return jsonify({"status": "success"})

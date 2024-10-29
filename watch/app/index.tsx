@@ -26,7 +26,21 @@ const WatchScreen: React.FC = () => {
     };
 
     generateWatchNumber();
-  }, []);
+
+    let intervalId: NodeJS.Timeout | null = null;
+
+    if (isVerified) {
+      intervalId = setInterval(() => {
+        sendVitalSigns();
+      }, 10000); // 每十秒鐘傳送一次
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId); // 清除定時器
+      }
+    };
+  }, [isVerified]);
 
   const sendWatchNumberToBackend = async (generatedWatchNumber: number) => {
     try {
@@ -58,6 +72,30 @@ const WatchScreen: React.FC = () => {
     } catch (error) {
       console.error('Error fetching match status:', error);
       setErrorMsg('Failed to verify match status.');
+    }
+  };
+
+  const sendVitalSigns = async () => {
+    const VitalSigns = {
+      heartRate: 72,
+      bloodPressure: '120/80',
+      bodyTemperature: 36.5
+    };
+
+    try {
+      const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/vitalsigns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(VitalSigns),
+      });
+      if (!response.ok) {
+        throw new Error('Error sending vital signs data to backend');
+      }
+    } catch (error) {
+      console.error('Error sending vital signs data:', error);
+      setErrorMsg('Failed to send vital signs data to backend');
     }
   };
 
