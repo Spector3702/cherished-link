@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     iconStyle: {
-        width: 50,
-        height: 50,
+        width: 70,
+        height: 70,
         marginBottom: 20,
     },
     successText: {
