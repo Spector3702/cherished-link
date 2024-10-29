@@ -22,7 +22,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 
-def send_notification(title, message):
+def send_notification(title, message, type):
     expo_push_token = current_app.config['EXPO_PUSH_TOKEN']
     if not expo_push_token:
         print("Expo push token is not set.")
@@ -37,7 +37,10 @@ def send_notification(title, message):
         "sound": "default",
         "title": title,
         "body": message,
-        "data": {"time": str(datetime.now())}
+        "data": {
+            "time": str(datetime.now()),
+            "type": type
+        }
     }
     response = requests.post(EXPO_PUSH_URL, headers=headers, json=data)
     if response.status_code == 200:
@@ -83,11 +86,19 @@ def gps():
     wandering = wander_detector.detect_wandering(location)
 
     if wandering:
-        send_notification("Wandering Alert", f"Parent is wandering in one place over {EXPECTED_WANDER_TIME} minutes!")
+        send_notification(
+            title="Wandering Alert", 
+            message=f"Parent is wandering in one place over {EXPECTED_WANDER_TIME} minutes!",
+            type="alert"
+        )
     
     distance_from_home = wander_detector._haversine_distance(home_location, location)
     if distance_from_home > EXPECTED_DISTANCE_FROM_HOME:
-        send_notification("Location Alert", f"Parent has moved {distance_from_home:.2f} meters away from home!")
+        send_notification(
+            title="Location Alert", 
+            message=f"Parent has moved {distance_from_home:.2f} meters away from home!",
+            type="alert"
+        )
 
     return jsonify({"wandering": wandering})
 
@@ -107,7 +118,11 @@ def voice_detection():
     dementiaDetection = DementiaDetection(user)
     detection = dementiaDetection.detection(file_path)
 
-    send_notification("Voice Received", f"Dementia detection result: {detection}")
+    send_notification(
+        title="Voice Received", 
+        message=f"Dementia detection result: {detection}",
+        type="info"
+    )
 
     return jsonify({"user": user, "audio_file": file_path})
 
@@ -117,6 +132,10 @@ def vitalsigns():
     requestData = request.get_json()
 
     formatted_vitalsigns = "Vitalsigns:\n" + "\n".join([f"  - {key}: {value}" for key, value in requestData.items()])
-    send_notification("Vital Signs Info", f"{formatted_vitalsigns}")
+    send_notification(
+        title="Vital Signs Received", 
+        message=f"{formatted_vitalsigns}",
+        type="info"
+    )
 
     return jsonify({"status": "success"})

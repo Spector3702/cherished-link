@@ -11,7 +11,7 @@ import {
 export default function PhoneNotificationPage() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notifications, setNotifications] = useState([
-    { id: '1', time: 'Current', message: 'Hi there, Welcome to cherished-link' },
+    { id: '1', time: 'Current', message: 'Hi there, Welcome to cherished-link', type: 'info' },
   ]);
 
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -43,6 +43,7 @@ export default function PhoneNotificationPage() {
           id: `${Date.now()}`,
           time: new Date().toLocaleString(),
           message: notification.request.content.body ?? 'No message',
+          type: notification.request.content.data.type,
         },
       ]);
     });
@@ -68,7 +69,12 @@ export default function PhoneNotificationPage() {
       <FlatList
         data={notifications}
         renderItem={({ item }) => (
-          <View style={styles.notification}>
+          <View
+            style={[
+              styles.notification,
+              item.type === 'alert' ? styles.alertBackground : styles.infoBackground,
+            ]}
+          >
             <Text>{item.time}</Text>
             <Text>{item.message}</Text>
           </View>
@@ -98,6 +104,14 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     borderWidth: 1,
     borderColor: '#ddd',
-    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    width: '90%',
+    alignSelf: 'center',
+  },
+  alertBackground: {
+    backgroundColor: 'rgba(255, 0, 0, 0.2)', // semi-transparent red for alert
+  },
+  infoBackground: {
+    backgroundColor: 'rgba(0, 0, 255, 0.2)', // semi-transparent blue for info
   },
 });
