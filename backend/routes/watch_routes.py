@@ -88,7 +88,7 @@ def gps():
     if wandering:
         send_notification(
             title="Wandering Alert", 
-            message=f"Parent is wandering in one place over {EXPECTED_WANDER_TIME} minutes!",
+            message=f"家屬已經在同個地方徘徊超過{EXPECTED_WANDER_TIME}分鐘!",
             type="alert"
         )
     
@@ -96,7 +96,7 @@ def gps():
     if distance_from_home > EXPECTED_DISTANCE_FROM_HOME:
         send_notification(
             title="Location Alert", 
-            message=f"Parent has moved {distance_from_home:.2f} meters away from home!",
+            message=f"家屬距離家裡{distance_from_home:.2f}公尺!",
             type="alert"
         )
 
@@ -120,7 +120,7 @@ def voice_detection():
 
     send_notification(
         title="Voice Received", 
-        message=f"Dementia detection result: {detection}",
+        message=f"失智偵測結果: {detection}",
         type="info"
     )
 
@@ -131,7 +131,7 @@ def voice_detection():
 def vitalsigns():
     requestData = request.get_json()
 
-    formatted_vitalsigns = "Vitalsigns:\n" + "\n".join([f"  - {key}: {value}" for key, value in requestData.items()])
+    formatted_vitalsigns = "生命跡象:\n" + "\n".join([f"  - {key}: {value}" for key, value in requestData.items()])
     send_notification(
         title="Vital Signs Received", 
         message=f"{formatted_vitalsigns}",

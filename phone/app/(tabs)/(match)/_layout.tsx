@@ -12,8 +12,8 @@ export default function MatchLayout() {
                     fontWeight: 'bold',
                 },
             }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="match_status" />
+            <Stack.Screen name="index" options={{ title: '配對' }} />
+            <Stack.Screen name="match_status" options={{ title: '配對狀態' }} />
         </Stack>
     );
 }

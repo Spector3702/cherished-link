@@ -101,9 +101,9 @@ const WatchScreen: React.FC = () => {
       <View style={styles.container}>
         {errorMsg && <Text style={styles.text}>{errorMsg}</Text>}
         {watchNumber !== null && (
-          <Text style={styles.text}>Watch Number: {watchNumber}</Text>
+          <Text style={styles.text}>手錶配對碼: {watchNumber}</Text>
         )}
-        <Button title="Verify" onPress={fetchMatchStatus} />
+        <Button title="認證配對" onPress={fetchMatchStatus} />
       </View>
     );
   }

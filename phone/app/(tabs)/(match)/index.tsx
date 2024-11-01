@@ -63,17 +63,17 @@ export default function MatchDevice() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Enter your device code:</Text>
+      <Text style={styles.title}>請輸入手錶配對碼:</Text>
       <TextInput
         style={styles.input}
         onChangeText={setDeviceCode}
         value={deviceCode}
-        placeholder="Device Code"
+        placeholder="配對碼"
         keyboardType="numeric"
       />
       {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
       <Button
-        title="Match Device"
+        title="配對裝置"
         onPress={handleMatchDevice}
       />
     </View>

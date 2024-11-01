@@ -11,7 +11,7 @@ import {
 export default function PhoneNotificationPage() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notifications, setNotifications] = useState([
-    { id: '1', time: 'Current', message: 'Hi there, Welcome to cherished-link', type: 'info' },
+    { id: '1', time: '現在', message: '您好, 歡迎使用 cherished-link', type: 'info' },
   ]);
 
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -81,13 +81,6 @@ export default function PhoneNotificationPage() {
         )}
         keyExtractor={item => item.id}
       />
-      <Button title="Register and Send Token" onPress={async () => {
-        const token = await registerForPushNotificationsAsync();
-        if (token) {
-          setExpoPushToken(token);
-          await sendTokenToBackend(token);
-        }
-      }} />
     </View>
   );
 }
@@ -105,7 +98,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 10,
-    width: '90%',
+    width: '100%',
     alignSelf: 'center',
   },
   alertBackground: {

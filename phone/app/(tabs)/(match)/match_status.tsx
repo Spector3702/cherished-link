@@ -9,9 +9,9 @@ export default function MatchStatus() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.status}>{matchSuccess ? "Matching Successful!" : "Matching Failed"}</Text>
+            <Text style={styles.status}>{matchSuccess ? "配對成功!" : "配對失敗"}</Text>
             <Link href={{ pathname: '/' }} style={styles.link}>
-                <Text style={styles.buttonText}>View notifications</Text>
+                <Text style={styles.buttonText}>回到首頁</Text>
             </Link>
         </View>
     );
