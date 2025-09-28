@@ -1,11 +1,12 @@
-# Cherished-Link 行為為基礎的早期失智症監測機器學習偵測模型
-全球逐漸走入高齡化世界，失智症也隨年齡增加呈現倍增之趨勢。而在診斷失智症的一系列檢查過程對於家屬及長輩來說都相當繁雜，有些家屬甚至是病患本身在早期可能會因此忽視掉症狀從而延誤就醫，這樣就會因而提高後續病狀發作的風險。本研究主要目的為探討以早期辨識失智症並通知使用者與家屬，達到預警以及早醫之目的。本研究使用網路公開中文語音資料庫，研究方法主要分為資料前處理、基礎機器學習與位置資料處理。透過將原始被陪伴者的語音形式資料轉為文字，依早期失智症行為特徵的分類諸如外出行為、社交行為、室內行為、邏輯語意等等進行特徵的萃取，再以機器學習演算法模型建立失智預警模型，根據定位資料進行特定位置樣本比對與漫遊迷路辨識，最後建立一失智辨識系統，以提供予家屬與家中陪伴者使用。
+# Cherished-Link: Behavior-Based Early Dementia Detection Machine Learning Model
+As the world gradually enters an aging society, dementia shows an exponential growth trend with increasing age. The series of examination processes for diagnosing dementia are quite complex for family members and elderly individuals. Some family members or even the patients themselves may ignore symptoms in the early stages, leading to delayed medical treatment and increased risk of subsequent symptom onset. The main purpose of this research is to explore early dementia identification and notification to users and family members, achieving the goal of early warning and timely medical intervention. This study uses publicly available Chinese speech databases, with research methods mainly divided into data preprocessing, basic machine learning, and location data processing. By converting original speech data from companions into text, extracting features based on early dementia behavioral characteristics such as outdoor behavior, social behavior, indoor behavior, logical semantics, etc., and then using machine learning algorithms to establish dementia warning models, conducting specific location sample comparison and wandering/lost identification based on positioning data, finally establishing a dementia identification system for use by family members and home companions.
+![image](docs/cherished_main_page.webp)
 
 
 ## Setup
 
 ### Python
-* 套件安裝（建議用虛擬環境）
+* Package installation (recommended to use virtual environment)
     ```shell
     pip install -r /backend/requirements.txt
     ```
@@ -38,7 +39,7 @@
 ### Python Backend
 * `cd backend`
 * `python App.py`
-* 畫面顯示類似這樣:
+* The screen will display something like this:
     ```sh
     * Running on all addresses (0.0.0.0)
     * Running on http://127.0.0.1:5000
@@ -46,21 +47,21 @@
     ```
 
 ### Run watch
-* 再開一個新的終端機
+* Open a new terminal
 * `cd watch`
 * `export EXPO_PUBLIC_BACKEND_URL={URL}/watch` 
-    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000/watch`
-    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000/watch"`
+    * Use the URL from the "third line" shown by the backend above, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000/watch`
+    * For Windows, use `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000/watch"`
 * `npx expo start`
 * press `shift+a`
 * select watch
 
 ### Run phone
-* 開一個新的終端機
+* Open a new terminal
 * `cd phone`
 * `export EXPO_PUBLIC_BACKEND_URL={URL}/phone` 
-    * URL 要用上面後端顯示的「第三行」, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000/phone`
-    * Windows 要換成 `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000/phone"`
+    * Use the URL from the "third line" shown by the backend above, ex: `export EXPO_PUBLIC_BACKEND_URL=http://192.168.4.114:5000/phone`
+    * For Windows, use `$Env:EXPO_PUBLIC_BACKEND_URL = "http://192.168.4.114:5000/phone"`
 * `npx expo start`
 * press `shift+a`
 * select emulator
